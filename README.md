@@ -12,6 +12,7 @@ local files, web addresses, databases, and datasets included with R packages.
 | **University** | Adventist University of Central Africa (AUCA) |
 | **Course** | R Programming |
 | **Assignment** | Assignment 1 |
+| **Instructor** | Dr. Pacifique NIZEYIMANA |
 
 ## Project contents
 
