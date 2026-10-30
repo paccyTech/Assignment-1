@@ -1,71 +1,119 @@
-# Simple R Data Import
+# Assignment 1: Importing Data in R
 
-Open `R-Data-Importer.Rproj` in RStudio, then run:
+This project demonstrates how to import data from different sources using R:
+local files, web addresses, databases, and datasets included with R packages.
+
+## Student information
+
+| | |
+|---|---|
+| **Student** | Pacifique Irakoze |
+| **Student ID** | 20252MBI012 |
+| **University** | Adventist University of Central Africa (AUCA) |
+| **Course** | R Programming |
+| **Assignment** | Assignment 1 |
+
+## Project contents
+
+- `R/import_data.R` — the `import_data()` function.
+- `tests/test_import_data.R` — basic tests for file and dataset imports.
+- `R-Data-Importer.Rproj` — RStudio project file.
+
+## Getting started
+
+1. Open `R-Data-Importer.Rproj` in RStudio.
+2. Load the import function:
+
+   ```r
+   source("R/import_data.R")
+   ```
+
+3. Use `import_data()` to load the data you need.
+
+## Examples
+
+### Import a local file
+
+The file type is detected from its extension.
 
 ```r
-source("R/import_data.R")
+students <- import_data("file", path = "data/students.csv")
 ```
 
-## Import a file
+Supported file types are CSV, TSV, Excel (`.xls` and `.xlsx`), JSON, RDS, and
+RData (`.RData` and `.rda`).
+
+Excel and JSON files require the corresponding package:
 
 ```r
-my_data <- import_data("file", path = "data/my_data.csv")
+install.packages("readxl")   # Excel files
+install.packages("jsonlite") # JSON files
 ```
 
-Supported files: CSV, TSV, Excel, JSON, RDS, and RData. Excel needs the
-`readxl` package; JSON needs `jsonlite`.
+### Import a file from the web
 
 ```r
-install.packages("readxl")
-install.packages("jsonlite")
+remote_data <- import_data(
+  "url",
+  path = "https://example.com/data.csv"
+)
 ```
 
-## Import from a web address
+The URL should point to a supported file type.
 
-```r
-my_data <- import_data("url", path = "https://example.com/data.csv")
-```
+### Import from a database
 
-## Import from a database
-
-Connect to a database with DBI, then give the connection and table name:
+For example, connect to a SQLite database with `DBI` and `RSQLite`:
 
 ```r
 install.packages(c("DBI", "RSQLite"))
 
-connection <- DBI::dbConnect(RSQLite::SQLite(), "my_database.sqlite")
-my_data <- import_data(
+connection <- DBI::dbConnect(
+  RSQLite::SQLite(),
+  "my_database.sqlite"
+)
+
+table_data <- import_data(
   "database",
   connection = connection,
-  table = "my_table"
+  table = "students"
 )
-```
 
-You can import a query instead of a table:
-
-```r
-my_data <- import_data(
+query_data <- import_data(
   "database",
   connection = connection,
-  query = "SELECT * FROM my_table"
+  query = "SELECT * FROM students"
 )
-```
 
-Close the connection when you are finished:
-
-```r
 DBI::dbDisconnect(connection)
 ```
 
-## Import a dataset included with R
+### Import a dataset included with R
 
 ```r
-my_data <- import_data("dataset", dataset = "iris")
+iris_data <- import_data("dataset", dataset = "iris")
 ```
 
-For another package's dataset, set `package`, for example
-`import_data("dataset", dataset = "storms", package = "dplyr")`.
+To load a dataset from another installed package, provide its package name:
 
-## Test
+```r
+storms_data <- import_data(
+  "dataset",
+  dataset = "storms",
+  package = "dplyr"
+)
+```
 
-Run `Rscript tests/test_import_data.R` from this project folder.
+## Run the tests
+
+From the project directory, run:
+
+```sh
+Rscript tests/test_import_data.R
+```
+
+## Notes
+
+- Excel and JSON imports need `readxl` and `jsonlite`, respectively.
+- Database imports need `DBI` and a compatible database driver.
+- The database connection is created and closed by the caller.
