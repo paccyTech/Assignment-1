@@ -1,3 +1,4 @@
+# Import data from a file, URL, database, or installed R dataset.
 import_data <- function(
   source = c("file", "url", "database", "dataset"),
   path = NULL,
@@ -7,10 +8,13 @@ import_data <- function(
   dataset = NULL,
   package = "datasets"
 ) {
+  # Match the requested source to one supported option.
   source <- match.arg(source)
 
+  # Read a local file or download a file from a web address.
   if (source %in% c("file", "url")) {
     if (source == "url") {
+      # Download the file temporarily and remove it after importing.
       source_url <- path
       extension <- tools::file_ext(sub("[?#].*$", "", path))
       path <- tempfile(fileext = paste0(".", extension))
@@ -18,6 +22,7 @@ import_data <- function(
       on.exit(unlink(path))
     }
 
+    # Use the reader that matches the file extension.
     extension <- tolower(tools::file_ext(path))
 
     if (extension == "csv") return(read.csv(path))
@@ -34,11 +39,13 @@ import_data <- function(
     stop("File type not supported. Try CSV, TSV, Excel, JSON, RDS, or RData.")
   }
 
+  # Read a database table or run a SQL query.
   if (source == "database") {
     if (!is.null(query)) return(DBI::dbGetQuery(connection, query))
     return(DBI::dbReadTable(connection, table))
   }
 
+  # Load a dataset from an installed R package.
   dataset_environment <- new.env()
   data(list = dataset, package = package, envir = dataset_environment)
   get(dataset, envir = dataset_environment)
